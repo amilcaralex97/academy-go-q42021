@@ -1,4 +1,4 @@
-module academy-go-q42021
+module go-project
 
 go 1.17
 
