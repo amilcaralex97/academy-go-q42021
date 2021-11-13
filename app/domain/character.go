@@ -3,6 +3,6 @@ package domain
 type Characters []Character
 
 type Character struct {
-	ID int `csv:"id"`
-	Name string `csv:"name"`
+	ID int `json:"id"`
+	Name string `json:"name"`
 }
