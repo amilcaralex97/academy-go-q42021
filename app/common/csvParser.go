@@ -4,9 +4,6 @@ import (
 	"encoding/csv"
 	"log"
 	"os"
-	"strconv"
-
-	"go-project/app/domain"
 )
 
 func ReadCsvFile(filePath string) [][]string {
@@ -23,26 +20,4 @@ func ReadCsvFile(filePath string) [][]string {
     }
 
     return records
-}
-
-func CreateCharacterList(data [][]string) []domain.Character {
-    var characterList []domain.Character
-    for i, line := range data {
-        if i > 0 {
-            var rec domain.Character
-            for j, field := range line {
-                if j == 0 {
-					var err error
-                    rec.ID, err = strconv.Atoi(field)
-					 if err != nil {
-                        continue
-                    }
-                } else if j == 1 {
-                    rec.Name = field
-                }
-            }
-            characterList = append(characterList, rec)
-        }
-    }
-    return characterList
 }
