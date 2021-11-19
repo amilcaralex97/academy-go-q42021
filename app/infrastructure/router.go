@@ -16,8 +16,10 @@ func Dispatch() {
 
 	r.Use(middleware.Logger)
 	
-	r.Get("/characters", interfaces.Index)
-	r.Get("/characters/:id", interfaces.Show)
+	r.Route("/characters", func(r chi.Router){
+		r.Get("/", interfaces.Index)
+		r.Get("/{id}", interfaces.Show)
+	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Printf("%s", err)
