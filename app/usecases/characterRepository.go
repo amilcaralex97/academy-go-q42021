@@ -7,26 +7,30 @@ import (
 	"go-project/app/domain"
 )
 
-func FindAll() (domain.Characters) {
-	data := common.ReadCsvFile("/home/amilcar/Documents/Projects/go-project/app/resources/characters.csv")
+const CSVFile string = "/home/amilcar/Documents/Projects/go-project/app/resources/characters.csv"
 
-	characterList := common.CreateCharacterList(data)
+func FindAll() (domain.Characters, error) {
+	data := common.ReadCsvFile(CSVFile)
+
+	characterList := domain.CreateCharacterList(data)
+
+	return characterList, nil
+}
+
+func FindByID(characterID int) (domain.Character, error) {
+	data := common.ReadCsvFile(CSVFile)
+
+	characterList := domain.CreateCharacterList(data)
 
 	fmt.Println(characterList)
 
-	return characterList
-}
+	var character domain.Character
 
-func FindByID(characterID int) (domain.Characters) {
-	data := common.ReadCsvFile("/home/amilcar/Documents/Projects/go-project/app/resources/characters.csv")
-
-	characterList := common.CreateCharacterList(data)
-
-	for k, v := range characterList {
-		fmt.Println(k, ' ', v)
+	for _, v := range characterList {
+		if(v.ID == characterID){
+			character = v
+		}
 	}
 
-	fmt.Println(characterList, characterID)
-
-	return characterList
+	return character, nil
 }
