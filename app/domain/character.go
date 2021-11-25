@@ -11,7 +11,7 @@ type Character struct {
 	Name string `json:"name"`
 }
 
-func CreateCharacterList(data [][]string) []Character {
+func CreateCharacterList(data [][]string) Characters {
     var characterList []Character
     for i, line := range data {
         if i > 0 {
