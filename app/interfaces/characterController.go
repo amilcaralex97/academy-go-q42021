@@ -6,18 +6,20 @@ import (
 	"strconv"
 
 	"go-project/app/usecases"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func Index( w http.ResponseWriter, r *http.Request) {
 
 
-	characters := usecases.Index()
+	characters, err := usecases.Index()
 
-	// if err != nil  {
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(500)
-	// 	json.NewEncoder(w).Encode(err)
-	// }
+	if err != nil  {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(characters)
@@ -25,17 +27,24 @@ func Index( w http.ResponseWriter, r *http.Request) {
 
 func Show(w http.ResponseWriter, r *http.Request) {
 
-	characterID, _ := strconv.Atoi(r.URL.Query().Get("id"))
+	characterID := chi.URLParam(r, "id")
 
+	characterIDInt, err := strconv.Atoi(characterID)
 
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+	}
 
-	character := usecases.Show(characterID)
-	// if err != nil {
+	character, err := usecases.Show(characterIDInt)
 
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(500)
-	// 	json.NewEncoder(w).Encode(err)
-	// }
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(err)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(character)
 }
