@@ -2,22 +2,25 @@ package common
 
 import (
 	"encoding/csv"
-	"log"
+	"errors"
 	"os"
 )
 
-func ReadCsvFile(filePath string) [][]string {
+func ReadCsvFile(filePath string) ([][]string, error) {
     f, err := os.Open(filePath)
+
     if err != nil {
-        log.Fatal("Unable to read input file " + filePath, err)
+        return nil, errors.New("error while trying to open CSV file")
     }
+    
     defer f.Close()
 
     csvReader := csv.NewReader(f)
     records, err := csvReader.ReadAll()
+
     if err != nil {
-        log.Fatal("Unable to parse file as CSV for " + filePath, err)
+        return nil, errors.New("unable to parse file as CSV for")
     }
 
-    return records
+    return records, nil
 }
