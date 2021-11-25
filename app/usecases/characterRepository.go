@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"errors"
 	"fmt"
 
 	"go-project/app/common"
@@ -8,17 +9,33 @@ import (
 )
 
 const CSVFile string = "/home/amilcar/Documents/Projects/go-project/app/resources/characters.csv"
+const CsvError string = "error while trying to read CSV file"
 
-func FindAll() (domain.Characters, error) {
-	data := common.ReadCsvFile(CSVFile)
+// type characterRepository interface {
+// 	FindAll() (domain.Characters, error)
+// 	FindByID(int) (domain.Character, error)
+// }
+
+func FindAll() (*domain.Characters, error) {
+	data, err := common.ReadCsvFile(CSVFile)
+
+	if err != nil {
+		return nil, errors.New(CsvError)
+	}
 
 	characterList := domain.CreateCharacterList(data)
 
-	return characterList, nil
+	return &characterList, nil
 }
 
-func FindByID(characterID int) (domain.Character, error) {
-	data := common.ReadCsvFile(CSVFile)
+func FindByID(characterID int) (*domain.Character, error) {
+	data, err := common.ReadCsvFile(CSVFile)
+
+	fmt.Println(characterID)
+
+	if err != nil {
+		return nil, errors.New(CsvError)
+	}
 
 	characterList := domain.CreateCharacterList(data)
 
@@ -30,7 +47,9 @@ func FindByID(characterID int) (domain.Character, error) {
 		if(v.ID == characterID){
 			character = v
 		}
-	}
+	} 
 
-	return character, nil
+	fmt.Println(character)
+
+	return &character, nil
 }
