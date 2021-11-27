@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"errors"
-	"fmt"
 
 	"go-project/app/common"
 	"go-project/app/domain"
@@ -11,12 +10,14 @@ import (
 const CSVFile string = "/home/amilcar/Documents/Projects/go-project/app/resources/characters.csv"
 const CsvError string = "error while trying to read CSV file"
 
-// type characterRepository interface {
-// 	FindAll() (domain.Characters, error)
-// 	FindByID(int) (domain.Character, error)
-// }
+type CharactersRepo struct{}
 
-func FindAll() (*domain.Characters, error) {
+
+func NewCharacterRepo() CharactersRepo{
+	return CharactersRepo{}
+}
+
+func (CharactersRepo) FindAll() (*domain.Characters, error) {
 	data, err := common.ReadCsvFile(CSVFile)
 
 	if err != nil {
@@ -28,10 +29,8 @@ func FindAll() (*domain.Characters, error) {
 	return &characterList, nil
 }
 
-func FindByID(characterID int) (*domain.Character, error) {
+func (CharactersRepo) FindByID(characterID int) (*domain.Character, error) {
 	data, err := common.ReadCsvFile(CSVFile)
-
-	fmt.Println(characterID)
 
 	if err != nil {
 		return nil, errors.New(CsvError)
@@ -39,17 +38,17 @@ func FindByID(characterID int) (*domain.Character, error) {
 
 	characterList := domain.CreateCharacterList(data)
 
-	fmt.Println(characterList)
-
-	var character domain.Character
+	character := domain.Character{}
 
 	for _, v := range characterList {
 		if(v.ID == characterID){
 			character = v
 		}
-	} 
+	}
 
-	fmt.Println(character)
+	if (domain.Character{}) == character {
+		return nil, errors.New("error: character doesn't exist")
+	}
 
 	return &character, nil
 }

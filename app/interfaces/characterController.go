@@ -5,44 +5,71 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-project/app/usecases"
+	"go-project/app/domain"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func Index( w http.ResponseWriter, r *http.Request) {
+type getter interface {
+	Index() (*domain.Characters, error)
+	Show(characterID int) (*domain.Character, error)
+}
+
+type CharactersHandler struct {
+	service getter
+}
 
 
-	characters, err := usecases.Index()
+func NewCharactersHandler(getter getter) CharactersHandler{
+	return CharactersHandler{getter}
+}
 
-	if err != nil  {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(err)
+
+func (ch CharactersHandler) Index( w http.ResponseWriter, r *http.Request) {
+
+
+	characters, err := ch.service.Index()
+
+	if err != nil {
+		bytes, _ := json.Marshal(struct {
+			Code int `json:"code"`
+			Message string `json:"message"`
+		}{http.StatusBadRequest, err.Error()})
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bytes)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(characters)
 }
 
-func Show(w http.ResponseWriter, r *http.Request) {
+func (ch CharactersHandler) Show(w http.ResponseWriter, r *http.Request) {
 
 	characterID := chi.URLParam(r, "id")
 
 	characterIDInt, err := strconv.Atoi(characterID)
 
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		bytes, _ := json.Marshal(struct {
+			Code int `json:"code"`
+			Message string `json:"message"`
+		}{http.StatusBadRequest, "id not allowed"})
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bytes)
 	}
 
-	character, err := usecases.Show(characterIDInt)
+	character, err := ch.service.Show(characterIDInt)
 
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(err)
+		bytes, _ := json.Marshal(struct {
+			Code int `json:"code"`
+			Message string `json:"message"`
+		}{http.StatusBadRequest, err.Error()})
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bytes)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
