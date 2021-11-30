@@ -21,7 +21,7 @@ func (CharactersRepo) FindAll() (*domain.Characters, error) {
 	data, err := common.ReadCsvFile(CSVFile)
 
 	if err != nil {
-		return nil, errors.New(CsvError)
+		return nil, errors.New(err.Error())
 	}
 
 	characterList := domain.CreateCharacterList(data)
@@ -33,7 +33,7 @@ func (CharactersRepo) FindByID(characterID int) (*domain.Character, error) {
 	data, err := common.ReadCsvFile(CSVFile)
 
 	if err != nil {
-		return nil, errors.New(CsvError)
+		return nil, errors.New(err.Error())
 	}
 
 	characterList := domain.CreateCharacterList(data)
