@@ -19,7 +19,7 @@ func ReadCsvFile(filePath string) ([][]string, error) {
     records, err := csvReader.ReadAll()
 
     if err != nil {
-        return nil, errors.New("unable to parse file as CSV for")
+        return nil, errors.New(err.Error())
     }
 
     return records, nil
