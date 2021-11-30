@@ -1,3 +1,2 @@
-id,name
-1,Luke
-2,Anakin
+id,name,height,mass,hair_color,skin_color,eye_color,birth_year,gender
+1,Amilcar Sanchez,178,64,black,brunette,brown,1997,male
