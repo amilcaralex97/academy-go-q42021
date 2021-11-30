@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"go-project/app/common"
@@ -14,28 +15,45 @@ const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resour
 
 type CharactersRepo struct{}
 
+type Response struct {
+	Results domain.Characters `json:"results"`
+}
+
 func NewCharacterRepo() CharactersRepo {
 	return CharactersRepo{}
 }
 
 func (CharactersRepo) FetchCharacters() (*domain.Characters, error) {
-	resp, err := http.Get("https://swapi.dev/api/people")
+	response, err := http.Get("https://swapi.dev/api/people")
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
-	defer resp.Body.Close()
+	responseObject := Response{}
+	json.Unmarshal(responseData, &responseObject)
 
-	//Create a variable of the same type as our model
-	var cResp *domain.Characters
+	data, err := common.ReadCsvFile(CSVFile)
 
-	json_resp := json.NewDecoder(resp.Body).Decode(&cResp)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
 
-	fmt.Println(json_resp)
+	lastId := len(data) - 1
 
-	//Invoke the text output function & return it with nil as the error value
-	return nil, json_resp
+	for i := 0; i < len(responseObject.Results); i++ {
+		responseObject.Results[i].ID = lastId + 1
+		lastId++
+	}
+
+	fmt.Println(responseObject.Results)
+
+	return &responseObject.Results, nil
 }
 
 func (CharactersRepo) FindAll() (*domain.Characters, error) {
