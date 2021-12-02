@@ -6,14 +6,14 @@ import (
 	"go-project/app/domain"
 )
 
-type getter interface {
+type repository interface {
 	FindAll() (*domain.Characters, error)
 	FindByID(characterID int) (*domain.Character, error)
 	FetchCharacters() (*domain.Characters, error)
 }
 
 type CharactersInteractor struct {
-	repo getter
+	repo repository
 }
 
 func NewCharactersInteractor(repo CharactersRepo) CharactersInteractor {
