@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"go-project/app/common"
 	"go-project/app/domain"
 
 	"github.com/go-chi/chi/v5"
@@ -30,10 +31,8 @@ func (ch CharactersHandler) FetchCharacters(w http.ResponseWriter, r *http.Reque
 	characters, err := ch.service.FetchCharacters()
 
 	if err != nil {
-		bytes, _ := json.Marshal(struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		}{http.StatusBadRequest, err.Error()})
+		e := common.Error{http.StatusBadRequest, err.Error()}
+		bytes := e.ErrorHandling()
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(bytes)
@@ -49,10 +48,8 @@ func (ch CharactersHandler) Index(w http.ResponseWriter, r *http.Request) {
 	characters, err := ch.service.Index()
 
 	if err != nil {
-		bytes, _ := json.Marshal(struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		}{http.StatusBadRequest, err.Error()})
+		e := common.Error{http.StatusBadRequest, err.Error()}
+		bytes := e.ErrorHandling()
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(bytes)
@@ -70,10 +67,8 @@ func (ch CharactersHandler) Show(w http.ResponseWriter, r *http.Request) {
 	characterIDInt, err := strconv.Atoi(characterID)
 
 	if err != nil {
-		bytes, _ := json.Marshal(struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		}{http.StatusBadRequest, "id not allowed"})
+		e := common.Error{http.StatusBadRequest, err.Error()}
+		bytes := e.ErrorHandling()
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(bytes)
