@@ -3,7 +3,6 @@ package usecases
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -51,8 +50,6 @@ func (CharactersRepo) FetchCharacters() (*domain.Characters, error) {
 		lastId++
 	}
 
-	fmt.Println(responseObject.Results)
-
 	return &responseObject.Results, nil
 }
 
@@ -82,6 +79,7 @@ func (CharactersRepo) FindByID(characterID int) (*domain.Character, error) {
 	for _, v := range characterList {
 		if v.ID == characterID {
 			character = v
+			break
 		}
 	}
 
