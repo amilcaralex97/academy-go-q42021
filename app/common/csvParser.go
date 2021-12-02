@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+//ReadCsvFile reads csv File
 func ReadCsvFile(filePath string) ([][]string, error) {
     f, err := os.Open(filePath)
 

@@ -16,18 +16,19 @@ type CharactersInteractor struct {
 	repo repository
 }
 
+//NewCharactersInteractor factory character interactor
 func NewCharactersInteractor(repo CharactersRepo) CharactersInteractor {
 	return CharactersInteractor{repo}
 }
 
-//Return fetched characters
+//FetchCharacters return fetched characters
 func (ci CharactersInteractor) FetchCharacters() (characters *domain.Characters, err error) {
 	characters, err = ci.repo.FetchCharacters()
 
 	return
 }
 
-// Return all characters
+//Index return all characters
 func (ci CharactersInteractor) Index() (characters *domain.Characters, err error) {
 	characters, err = ci.repo.FindAll()
 
@@ -38,7 +39,7 @@ func (ci CharactersInteractor) Index() (characters *domain.Characters, err error
 	return
 }
 
-// Return character by ID
+//Show return character by ID
 func (ci CharactersInteractor) Show(characterID int) (character *domain.Character, err error) {
 	character, err = ci.repo.FindByID(characterID)
 

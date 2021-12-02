@@ -20,10 +20,12 @@ type CharactersHandler struct {
 	service getter
 }
 
+//NewCharactersHandler factory of character handler
 func NewCharactersHandler(getter getter) CharactersHandler {
 	return CharactersHandler{getter}
 }
 
+//FetchCharacters fetch characters from api and return as json
 func (ch CharactersHandler) FetchCharacters(w http.ResponseWriter, r *http.Request) {
 	characters, err := ch.service.FetchCharacters()
 
@@ -41,6 +43,7 @@ func (ch CharactersHandler) FetchCharacters(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(characters)
 }
 
+//Index return Characters from CSV as JSON
 func (ch CharactersHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	characters, err := ch.service.Index()
@@ -59,6 +62,7 @@ func (ch CharactersHandler) Index(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(characters)
 }
 
+////Index return Character by ID from CSV as JSON
 func (ch CharactersHandler) Show(w http.ResponseWriter, r *http.Request) {
 
 	characterID := chi.URLParam(r, "id")

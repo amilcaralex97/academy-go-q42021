@@ -18,10 +18,12 @@ type Response struct {
 	Results domain.Characters `json:"results"`
 }
 
+//NewCharacterRepo factory Character repo
 func NewCharacterRepo() CharactersRepo {
 	return CharactersRepo{}
 }
 
+//FetchCharacters gets characters from an API
 func (CharactersRepo) FetchCharacters() (*domain.Characters, error) {
 	response, err := http.Get("https://swapi.dev/api/people")
 	if err != nil {
@@ -53,6 +55,7 @@ func (CharactersRepo) FetchCharacters() (*domain.Characters, error) {
 	return &responseObject.Results, nil
 }
 
+//FindAll gets characters from csv
 func (CharactersRepo) FindAll() (*domain.Characters, error) {
 	data, err := common.ReadCsvFile(CSVFile)
 
@@ -65,6 +68,7 @@ func (CharactersRepo) FindAll() (*domain.Characters, error) {
 	return &characterList, nil
 }
 
+//FindByID get character in the csv by ID
 func (CharactersRepo) FindByID(characterID int) (*domain.Character, error) {
 	data, err := common.ReadCsvFile(CSVFile)
 
