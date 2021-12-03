@@ -5,16 +5,20 @@ import (
 	"net/http"
 
 	"go-project/app/interfaces"
+	"go-project/app/repository"
 	"go-project/app/usecases"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resources/characters.csv"
+const URL string = "https://swapi.dev/api/people"
+
 // Dispatch is handle routing
 func Dispatch() {
 	//dependendy injection
-	charactersService := usecases.NewCharactersInteractor(usecases.NewCharacterRepo())
+	charactersService := usecases.NewCharactersInteractor(repository.NewCharacterRepo(), repository.NewApiRepo(URL), repository.NewCsvRepo(CSVFile))
 	charactersHandler := interfaces.NewCharactersHandler(charactersService)
 
 	r := chi.NewRouter()

@@ -12,8 +12,8 @@ import (
 )
 
 type getter interface {
-	FetchCharacters() (characters *domain.Characters, err error)
-	Index() (*domain.Characters, error)
+	FetchCharacters() (characters domain.Characters, err error)
+	Index() (domain.Characters, error)
 	Show(characterID int) (*domain.Character, error)
 }
 
@@ -77,10 +77,8 @@ func (ch CharactersHandler) Show(w http.ResponseWriter, r *http.Request) {
 	character, err := ch.service.Show(characterIDInt)
 
 	if err != nil {
-		bytes, _ := json.Marshal(struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		}{http.StatusBadRequest, err.Error()})
+		e := common.Error{http.StatusBadRequest, err.Error()}
+		bytes := e.ErrorHandling()
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(bytes)
