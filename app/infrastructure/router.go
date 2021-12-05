@@ -29,6 +29,7 @@ func Dispatch() {
 		r.Get("/", charactersHandler.Index)
 		r.Get("/{id}", charactersHandler.Show)
 		r.Get("/fetch-characters", charactersHandler.FetchCharacters)
+		r.Get("/concurrent-characters", charactersHandler.ConcurrentCharacters)
 	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {
