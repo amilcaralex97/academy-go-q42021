@@ -18,7 +18,7 @@ type Character struct {
 	Gender    string `json:"gender"`
 }
 
-//CreateCharacterList returns a list of characters form CSV
+//CreateCharacterList returns a list of characters from CSV
 func CreateCharacterList(data [][]string) Characters {
 	var characterList []Character
 	for i, line := range data {
