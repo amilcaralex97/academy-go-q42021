@@ -18,7 +18,7 @@ type apiI interface {
 
 type csvI interface {
 	ReadCsvFile() ([][]string, error)
-	Addrow(characters domain.Characters) error
+	Addrows(characters domain.Characters) error
 }
 type CharactersInteractor struct {
 	repo repository
@@ -49,11 +49,10 @@ func (ci CharactersInteractor) FetchCharacters() (characters domain.Characters, 
 
 	for i := 0; i < len(characters); i++ {
 		characters[i].ID = lastId + 1
-		// row := []string{strconv.Itoa(characters[i].ID), characters[i].Name, strconv.Itoa(characters[i].Height), strconv.Itoa(characters[i].Mass), characters[i].HairColor, characters[i].SkinColor, characters[i].EyeColor, characters[i].BirthYear, characters[i].Gender}
 		lastId++
 	}
 
-	ci.csv.Addrow(characters)
+	ci.csv.Addrows(characters)
 
 	return
 }

@@ -26,6 +26,24 @@ func NewCharactersHandler(getter getter) CharactersHandler {
 	return CharactersHandler{getter}
 }
 
+func (ch CharactersHandler) ConcurrentCharacters(w http.ResponseWriter, r *http.Request) {
+	r.URL.Query().Get("type")
+	r.URL.Query().Get("items")
+	r.URL.Query().Get("items_per_workers")
+	characters, err := ch.service.FetchCharacters()
+
+	if err != nil {
+		e := common.Error{http.StatusBadRequest, err.Error()}
+		bytes := e.ErrorHandling()
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bytes)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(characters)
+}
+
 //FetchCharacters fetch characters from api and return as json
 func (ch CharactersHandler) FetchCharacters(w http.ResponseWriter, r *http.Request) {
 	characters, err := ch.service.FetchCharacters()

@@ -41,7 +41,7 @@ func (cs CsvRepo) ReadCsvFile() ([][]string, error) {
 }
 
 // Updates Csvfile
-func (cs CsvRepo) Addrow(characters domain.Characters) error {
+func (cs CsvRepo) Addrows(characters domain.Characters) error {
 	f, err := os.OpenFile(cs.filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return errors.New(err.Error())
