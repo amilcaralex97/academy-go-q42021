@@ -62,7 +62,3 @@ func CreateCharacterList(data [][]string) Characters {
 	}
 	return characterList
 }
-
-//func CharacterCsvWriter() {
-//    writer := csv.Writer()
-//}
