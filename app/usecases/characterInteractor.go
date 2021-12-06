@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"encoding/csv"
 	"errors"
 
 	"go-project/app/domain"
@@ -17,14 +18,15 @@ type apiI interface {
 }
 
 type csvI interface {
-	ReadCsvFile() ([][]string, error)
+	ReadCsvFiletoString() ([][]string, error)
+	ReadCsvFile() (*csv.Reader, error)
 	Addrows(characters domain.Characters) error
 }
 
 type workerPool interface {
-	Run()
-	AddTask(task func())
+	WorkerPoolCsv(t string, items int, itpw int) (domain.Characters, error)
 }
+
 type CharactersInteractor struct {
 	repo repository
 	api  apiI
@@ -37,6 +39,12 @@ func NewCharactersInteractor(repo r.CharactersRepo, apiRepo r.ApiRepo, csvRepo r
 	return CharactersInteractor{repo, apiRepo, csvRepo, poolRepo}
 }
 
+//Return characters concurrently
+func (ci CharactersInteractor) CharactersConcurrently(t string, items int, itpw int) (charactersCsv domain.Characters, err error) {
+	ci.pool.WorkerPoolCsv(t, items, itpw)
+	return charactersCsv, nil
+}
+
 //FetchCharacters return fetched characters
 func (ci CharactersInteractor) FetchCharacters() (charactersCsv domain.Characters, err error) {
 	characters, err := ci.api.FetchCharacters()
@@ -45,7 +53,7 @@ func (ci CharactersInteractor) FetchCharacters() (charactersCsv domain.Character
 		return nil, errors.New(err.Error())
 	}
 
-	data, err := ci.csv.ReadCsvFile()
+	data, err := ci.csv.ReadCsvFiletoString()
 
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -73,8 +81,7 @@ func (ci CharactersInteractor) FetchCharacters() (charactersCsv domain.Character
 
 //Index return all characters
 func (ci CharactersInteractor) Index() (characters domain.Characters, err error) {
-	data, err := ci.csv.ReadCsvFile()
-
+	data, err := ci.csv.ReadCsvFiletoString()
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
@@ -90,7 +97,7 @@ func (ci CharactersInteractor) Index() (characters domain.Characters, err error)
 
 //Show return character by ID
 func (ci CharactersInteractor) Show(characterID int) (character *domain.Character, err error) {
-	data, err := ci.csv.ReadCsvFile()
+	data, err := ci.csv.ReadCsvFiletoString()
 
 	if err != nil {
 		return nil, errors.New(err.Error())
