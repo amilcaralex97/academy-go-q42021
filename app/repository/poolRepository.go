@@ -4,7 +4,9 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
+	"math"
 	"os"
+	"strconv"
 	"sync"
 
 	"go-project/app/domain"
@@ -20,19 +22,28 @@ func NewWorkerPool() WorkerPool {
 	return WorkerPool{}
 }
 
-func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan<- domain.Character) {
+func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan<- domain.Character, items int) {
+	counter := 0
+
 	for {
+		if cap(results) == len(results) {
+			return
+		}
 		select {
 		case job, ok := <-jobs:
 			if !ok {
 				return
 			}
-			character := domain.CreateCharacter(job)
-			if t == "odd" && character.ID%2 != 0 {
-				results <- character
-			} else if t == "even" && character.ID%2 == 0 {
-				results <- character
+
+			id, _ := strconv.Atoi(job[0])
+
+			if t == "odd" && id%2 == 0 {
+				continue
+			} else if t == "even" && id%2 != 0 {
+				continue
 			}
+			results <- domain.CreateCharacter(job)
+			counter++
 		}
 	}
 }
@@ -50,7 +61,7 @@ func (wp WorkerPool) WorkerPoolCsv(t string, items int, itpw int) (domain.Charac
 
 	var characters domain.Characters
 
-	workers := items / itpw
+	workers := int(math.Ceil(float64(items) / float64(itpw)))
 
 	jobs := make(chan []string, items)
 	res := make(chan domain.Character, items)
@@ -62,7 +73,7 @@ func (wp WorkerPool) WorkerPoolCsv(t string, items int, itpw int) (domain.Charac
 
 		go func() {
 			defer wg.Done()
-			wp.worker(t, jobs, res)
+			wp.worker(t, jobs, res, items)
 		}()
 	}
 
