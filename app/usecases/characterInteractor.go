@@ -20,20 +20,26 @@ type csvI interface {
 	ReadCsvFile() ([][]string, error)
 	Addrows(characters domain.Characters) error
 }
+
+type workerPool interface {
+	Run()
+	AddTask(task func())
+}
 type CharactersInteractor struct {
 	repo repository
 	api  apiI
 	csv  csvI
+	pool workerPool
 }
 
 //NewCharactersInteractor factory character interactor
-func NewCharactersInteractor(repo r.CharactersRepo, apiRepo r.ApiRepo, csvRepo r.CsvRepo) CharactersInteractor {
-	return CharactersInteractor{repo, apiRepo, csvRepo}
+func NewCharactersInteractor(repo r.CharactersRepo, apiRepo r.ApiRepo, csvRepo r.CsvRepo, poolRepo r.WorkerPool) CharactersInteractor {
+	return CharactersInteractor{repo, apiRepo, csvRepo, poolRepo}
 }
 
 //FetchCharacters return fetched characters
-func (ci CharactersInteractor) FetchCharacters() (characters domain.Characters, err error) {
-	characters, err = ci.api.FetchCharacters()
+func (ci CharactersInteractor) FetchCharacters() (charactersCsv domain.Characters, err error) {
+	characters, err := ci.api.FetchCharacters()
 
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -53,6 +59,14 @@ func (ci CharactersInteractor) FetchCharacters() (characters domain.Characters, 
 	}
 
 	ci.csv.Addrows(characters)
+
+	charactersCsv, err = ci.repo.FindAll(data)
+
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	charactersCsv = append(charactersCsv, characters...)
 
 	return
 }

@@ -48,7 +48,7 @@ func (cs CsvRepo) Addrows(characters domain.Characters) error {
 	}
 	w := csv.NewWriter(f)
 	for _, character := range characters {
-		row := []string{strconv.Itoa(character.ID), character.Name, strconv.Itoa(character.Height), strconv.Itoa(character.Mass), character.HairColor, character.SkinColor, character.EyeColor, character.BirthYear, character.Gender}
+		row := []string{strconv.Itoa(character.ID), character.Name}
 		w.Write(row)
 	}
 	w.Flush()
