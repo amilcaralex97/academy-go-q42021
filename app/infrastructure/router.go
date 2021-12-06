@@ -18,7 +18,7 @@ const URL string = "https://swapi.dev/api/people"
 // Dispatch is handle routing
 func Dispatch() {
 	//dependendy injection
-	charactersService := usecases.NewCharactersInteractor(repository.NewCharacterRepo(), repository.NewApiRepo(URL), repository.NewCsvRepo(CSVFile))
+	charactersService := usecases.NewCharactersInteractor(repository.NewCharacterRepo(), repository.NewApiRepo(URL), repository.NewCsvRepo(CSVFile), repository.NewWorkerPool())
 	charactersHandler := interfaces.NewCharactersHandler(charactersService)
 
 	r := chi.NewRouter()
