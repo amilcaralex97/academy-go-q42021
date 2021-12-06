@@ -40,9 +40,13 @@ func NewCharactersInteractor(repo r.CharactersRepo, apiRepo r.ApiRepo, csvRepo r
 }
 
 //Return characters concurrently
-func (ci CharactersInteractor) CharactersConcurrently(t string, items int, itpw int) (charactersCsv domain.Characters, err error) {
-	ci.pool.WorkerPoolCsv(t, items, itpw)
-	return charactersCsv, nil
+func (ci CharactersInteractor) CharactersConcurrently(t string, items int, itpw int) (characters domain.Characters, err error) {
+	characters, err = ci.pool.WorkerPoolCsv(t, items, itpw)
+
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	return characters, nil
 }
 
 //FetchCharacters return fetched characters
@@ -59,7 +63,7 @@ func (ci CharactersInteractor) FetchCharacters() (charactersCsv domain.Character
 		return nil, errors.New(err.Error())
 	}
 
-	lastId := len(data) - 1
+	lastId := len(data)
 
 	for i := 0; i < len(characters); i++ {
 		characters[i].ID = lastId + 1

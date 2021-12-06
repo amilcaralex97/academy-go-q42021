@@ -27,11 +27,10 @@ func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan<- domai
 			if !ok {
 				return
 			}
-
 			character := domain.CreateCharacter(job)
-			if t == "odd" && character.ID%2 == 0 {
+			if t == "odd" && character.ID%2 != 0 {
 				results <- character
-			} else if t == "even" && character.ID%2 != 0 {
+			} else if t == "even" && character.ID%2 == 0 {
 				results <- character
 			}
 		}
@@ -67,20 +66,23 @@ func (wp WorkerPool) WorkerPoolCsv(t string, items int, itpw int) (domain.Charac
 		}()
 	}
 
-	for j := 1; j <= workers; j++ {
-		rStr, err := reader.Read()
-		if err == io.EOF {
-			break
+	go func() {
+		for {
+			record, err := reader.Read()
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				continue
+			}
+			jobs <- record
 		}
-		if err != nil {
-			break
-		}
-		jobs <- rStr
-	}
+		close(jobs)
+	}()
 
-	close(jobs)
-	wg.Wait()
-	close(res)
+	go func() {
+		wg.Wait()
+		close(res)
+	}()
 
 	for r := range res {
 		characters = append(characters, r)
