@@ -12,6 +12,7 @@ import (
 )
 
 type getter interface {
+	CharactersConcurrently(t string, items int, itpw int) (charactersCsv domain.Characters, err error)
 	FetchCharacters() (characters domain.Characters, err error)
 	Index() (domain.Characters, error)
 	Show(characterID int) (*domain.Character, error)
@@ -27,10 +28,23 @@ func NewCharactersHandler(getter getter) CharactersHandler {
 }
 
 func (ch CharactersHandler) ConcurrentCharacters(w http.ResponseWriter, r *http.Request) {
-	r.URL.Query().Get("type")
-	r.URL.Query().Get("items")
-	r.URL.Query().Get("items_per_workers")
-	characters, err := ch.service.FetchCharacters()
+	typeQuery := r.URL.Query().Get("type")
+	items, _ := strconv.Atoi(r.URL.Query().Get("items"))
+	itpw, _ := strconv.Atoi(r.URL.Query().Get("items_per_workers"))
+
+	if typeQuery == "" {
+		typeQuery = "even"
+	}
+
+	if items == 0 {
+		items = 1
+	}
+
+	if itpw == 0 {
+		itpw = 1
+	}
+
+	characters, err := ch.service.CharactersConcurrently(typeQuery, items, itpw)
 
 	if err != nil {
 		e := common.Error{http.StatusBadRequest, err.Error()}
@@ -62,7 +76,6 @@ func (ch CharactersHandler) FetchCharacters(w http.ResponseWriter, r *http.Reque
 
 //Index return Characters from CSV as JSON
 func (ch CharactersHandler) Index(w http.ResponseWriter, r *http.Request) {
-
 	characters, err := ch.service.Index()
 
 	if err != nil {
