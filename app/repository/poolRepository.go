@@ -14,6 +14,8 @@ import (
 
 const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resources/characters.csv"
 
+var counter = 0
+
 type WorkerPool struct {
 }
 
@@ -22,16 +24,15 @@ func NewWorkerPool() WorkerPool {
 	return WorkerPool{}
 }
 
-func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan<- domain.Character, items int) {
-	counter := 0
-
+func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan domain.Character, items int) {
 	for {
-		if cap(results) == len(results) {
-			return
-		}
 		select {
 		case job, ok := <-jobs:
 			if !ok {
+				return
+			}
+
+			if counter == items {
 				return
 			}
 
@@ -42,9 +43,10 @@ func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan<- domai
 			} else if t == "even" && id%2 != 0 {
 				continue
 			}
+
 			results <- domain.CreateCharacter(job)
-			counter++
 		}
+		counter++
 	}
 }
 
@@ -63,8 +65,8 @@ func (wp WorkerPool) WorkerPoolCsv(t string, items int, itpw int) (domain.Charac
 
 	workers := int(math.Ceil(float64(items) / float64(itpw)))
 
-	jobs := make(chan []string, items)
-	res := make(chan domain.Character, items)
+	jobs := make(chan []string)
+	res := make(chan domain.Character, items-1)
 
 	var wg sync.WaitGroup
 
@@ -98,6 +100,8 @@ func (wp WorkerPool) WorkerPoolCsv(t string, items int, itpw int) (domain.Charac
 	for r := range res {
 		characters = append(characters, r)
 	}
+
+	counter = 0
 
 	return characters, nil
 }
