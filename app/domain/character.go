@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"strconv"
 )
 
@@ -35,13 +36,17 @@ func CreateCharacterList(data [][]string) Characters {
 }
 
 //Parse character
-func CreateCharacter(data []string) (character Character) {
-	id, _ := strconv.Atoi(data[0])
+func CreateCharacter(data []string) (character Character, err error) {
+	id, err := strconv.Atoi(data[0])
+
+	if err != nil {
+		return Character{}, errors.New("error while parsig character id")
+	}
 
 	character = Character{
 		ID:   id,
 		Name: data[1],
 	}
 
-	return character
+	return character, nil
 }
