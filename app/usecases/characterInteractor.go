@@ -10,7 +10,7 @@ import (
 
 type repository interface {
 	FindAll(data [][]string) (domain.Characters, error)
-	FindByID(data [][]string, characterID int) (*domain.Character, error)
+	FindByID(data [][]string, characterID int) (domain.Character, error)
 }
 
 type apiI interface {
@@ -100,17 +100,17 @@ func (ci CharactersInteractor) Index() (characters domain.Characters, err error)
 }
 
 //Show return character by ID
-func (ci CharactersInteractor) Show(characterID int) (character *domain.Character, err error) {
+func (ci CharactersInteractor) Show(characterID int) (character domain.Character, err error) {
 	data, err := ci.csv.ReadCsvFiletoString()
 
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return domain.Character{}, errors.New(err.Error())
 	}
 
 	character, err = ci.repo.FindByID(data, characterID)
 
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return domain.Character{}, errors.New(err.Error())
 	}
 
 	return
