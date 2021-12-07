@@ -19,14 +19,13 @@ func NewCharacterRepo() CharactersRepo {
 
 //FindAll gets characters from csv
 func (CharactersRepo) FindAll(data [][]string) (domain.Characters, error) {
-
 	characterList := domain.CreateCharacterList(data)
 
 	return characterList, nil
 }
 
 //FindByID get character in the csv by ID
-func (CharactersRepo) FindByID(data [][]string, characterID int) (*domain.Character, error) {
+func (CharactersRepo) FindByID(data [][]string, characterID int) (domain.Character, error) {
 	characterList := domain.CreateCharacterList(data)
 
 	character := domain.Character{}
@@ -39,8 +38,8 @@ func (CharactersRepo) FindByID(data [][]string, characterID int) (*domain.Charac
 	}
 
 	if (domain.Character{}) == character {
-		return nil, errors.New("error: character doesn't exist")
+		return domain.Character{}, errors.New("error: character doesn't exist")
 	}
 
-	return &character, nil
+	return character, nil
 }

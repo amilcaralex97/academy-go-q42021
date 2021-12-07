@@ -15,7 +15,7 @@ type getter interface {
 	CharactersConcurrently(t string, items int, itpw int) (charactersCsv domain.Characters, err error)
 	FetchCharacters() (characters domain.Characters, err error)
 	Index() (domain.Characters, error)
-	Show(characterID int) (*domain.Character, error)
+	Show(characterID int) (domain.Character, error)
 }
 
 type CharactersHandler struct {
