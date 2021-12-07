@@ -44,7 +44,13 @@ func (wp WorkerPool) worker(t string, jobs <-chan []string, results chan domain.
 				continue
 			}
 
-			results <- domain.CreateCharacter(job)
+			character, err := domain.CreateCharacter(job)
+
+			if err != nil {
+				continue
+			}
+
+			results <- character
 		}
 		counter++
 	}
