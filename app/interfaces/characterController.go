@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -31,9 +32,13 @@ func (ch CharactersHandler) ConcurrentCharacters(w http.ResponseWriter, r *http.
 	typeQuery := r.URL.Query().Get("type")
 	items, _ := strconv.Atoi(r.URL.Query().Get("items"))
 	itpw, _ := strconv.Atoi(r.URL.Query().Get("items_per_workers"))
-
+	fmt.Println(typeQuery)
 	if typeQuery == "" {
-		typeQuery = "even"
+		e := common.Error{http.StatusBadRequest, "wrong param"}
+		bytes := e.ErrorHandling()
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bytes)
 	}
 
 	if items == 0 {
