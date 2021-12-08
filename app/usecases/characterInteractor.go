@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"go-project/app/domain"
-	r "go-project/app/repository"
 )
 
 type repository interface {
@@ -18,7 +17,7 @@ type CharactersInteractor struct {
 }
 
 //NewCharactersInteractor factory character interactor
-func NewCharactersInteractor(repo r.CharactersRepo) CharactersInteractor {
+func NewCharactersInteractor(repo repository) CharactersInteractor {
 	return CharactersInteractor{repo}
 }
 
