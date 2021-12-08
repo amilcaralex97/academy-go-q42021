@@ -16,9 +16,6 @@ import (
 	"go-project/app/domain"
 )
 
-const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resources/characters.csv"
-const URL string = "https://swapi.dev/api/people"
-
 var counter = 0
 
 type csvI interface {
@@ -43,7 +40,7 @@ func NewCharacterRepo(csvC csvI, file string, api string) CharactersRepo {
 
 //FindAll gets characters from csv
 func (cr CharactersRepo) FindAll() (domain.Characters, error) {
-	data, err := cr.csvC.ReadCsvFiletoString(CSVFile)
+	data, err := cr.csvC.ReadCsvFiletoString(cr.file)
 
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -56,7 +53,7 @@ func (cr CharactersRepo) FindAll() (domain.Characters, error) {
 
 //FetchCharacters gets characters from an API
 func (cr CharactersRepo) FetchCharacters() (domain.Characters, error) {
-	response, err := http.Get(URL)
+	response, err := http.Get(cr.api)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
@@ -72,7 +69,7 @@ func (cr CharactersRepo) FetchCharacters() (domain.Characters, error) {
 
 	fmt.Println(responseObject.Results)
 
-	data, err := cr.csvC.ReadCsvFiletoString(CSVFile)
+	data, err := cr.csvC.ReadCsvFiletoString(cr.file)
 
 	fmt.Println(data)
 
@@ -89,7 +86,7 @@ func (cr CharactersRepo) FetchCharacters() (domain.Characters, error) {
 		lastId++
 	}
 
-	cr.csvC.Addrows(responseObject.Results, CSVFile)
+	cr.csvC.Addrows(responseObject.Results, cr.file)
 
 	charactersCsv, err := cr.FindAll()
 
@@ -104,7 +101,7 @@ func (cr CharactersRepo) FetchCharacters() (domain.Characters, error) {
 
 // WorkerPoolCsv csv reader worker pool
 func (cr CharactersRepo) WorkerPoolCsv(t string, items int, itpw int) (domain.Characters, error) {
-	file, err := os.Open(CSVFile)
+	file, err := os.Open(cr.file)
 
 	if err != nil {
 		return nil, errors.New(err.Error())
