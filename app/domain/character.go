@@ -1,28 +1,22 @@
 package domain
 
 import (
+	"errors"
 	"strconv"
 )
 
 type Characters []Character
 
 type Character struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	Height    int    `json:"height"`
-	Mass      int    `json:"mass"`
-	HairColor string `json:"hair_color"`
-	SkinColor string `json:"skin_color"`
-	EyeColor  string `json:"eye_color"`
-	BirthYear string `json:"birth_year"`
-	Gender    string `json:"gender"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
-//CreateCharacterList returns a list of characters form CSV
+//CreateCharacterList returns a list of characters from CSV
 func CreateCharacterList(data [][]string) Characters {
 	var characterList []Character
 	for i, line := range data {
-		if i > 0 {
+		if i >= 0 {
 			var rec Character
 			for j, field := range line {
 				if j == 0 {
@@ -33,28 +27,6 @@ func CreateCharacterList(data [][]string) Characters {
 					}
 				} else if j == 1 {
 					rec.Name = field
-				} else if j == 2 {
-					var err error
-					rec.Height, err = strconv.Atoi(field)
-					if err != nil {
-						continue
-					}
-				} else if j == 3 {
-					var err error
-					rec.Mass, err = strconv.Atoi(field)
-					if err != nil {
-						continue
-					}
-				} else if j == 4 {
-					rec.HairColor = field
-				} else if j == 5 {
-					rec.SkinColor = field
-				} else if j == 6 {
-					rec.EyeColor = field
-				} else if j == 7 {
-					rec.BirthYear = field
-				} else if j == 8 {
-					rec.Gender = field
 				}
 			}
 			characterList = append(characterList, rec)
@@ -63,6 +35,18 @@ func CreateCharacterList(data [][]string) Characters {
 	return characterList
 }
 
-//func CharacterCsvWriter() {
-//    writer := csv.Writer()
-//}
+//Parse character
+func CreateCharacter(data []string) (character Character, err error) {
+	id, err := strconv.Atoi(data[0])
+
+	if err != nil {
+		return Character{}, errors.New("error while parsig character id")
+	}
+
+	character = Character{
+		ID:   id,
+		Name: data[1],
+	}
+
+	return character, nil
+}

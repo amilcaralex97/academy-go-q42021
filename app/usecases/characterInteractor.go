@@ -4,69 +4,47 @@ import (
 	"errors"
 
 	"go-project/app/domain"
-	r "go-project/app/repository"
 )
 
 type repository interface {
-	FindAll(data [][]string) (domain.Characters, error)
-	FindByID(data [][]string, characterID int) (*domain.Character, error)
-}
-
-type apiI interface {
+	FindAll() (domain.Characters, error)
 	FetchCharacters() (domain.Characters, error)
+	WorkerPoolCsv(t string, items int, itpw int) (domain.Characters, error)
 }
 
-type csvI interface {
-	ReadCsvFile() ([][]string, error)
-	Addrow(characters domain.Characters) error
-}
 type CharactersInteractor struct {
 	repo repository
-	api  apiI
-	csv  csvI
 }
 
 //NewCharactersInteractor factory character interactor
-func NewCharactersInteractor(repo r.CharactersRepo, apiRepo r.ApiRepo, csvRepo r.CsvRepo) CharactersInteractor {
-	return CharactersInteractor{repo, apiRepo, csvRepo}
+func NewCharactersInteractor(repo repository) CharactersInteractor {
+	return CharactersInteractor{repo}
+}
+
+//Return characters concurrently
+func (ci CharactersInteractor) CharactersConcurrently(t string, items int, itpw int) (characters domain.Characters, err error) {
+	characters, err = ci.repo.WorkerPoolCsv(t, items, itpw)
+
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	return characters, nil
 }
 
 //FetchCharacters return fetched characters
 func (ci CharactersInteractor) FetchCharacters() (characters domain.Characters, err error) {
-	characters, err = ci.api.FetchCharacters()
+	characters, err = ci.repo.FetchCharacters()
 
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-
-	data, err := ci.csv.ReadCsvFile()
-
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
-
-	lastId := len(data) - 1
-
-	for i := 0; i < len(characters); i++ {
-		characters[i].ID = lastId + 1
-		// row := []string{strconv.Itoa(characters[i].ID), characters[i].Name, strconv.Itoa(characters[i].Height), strconv.Itoa(characters[i].Mass), characters[i].HairColor, characters[i].SkinColor, characters[i].EyeColor, characters[i].BirthYear, characters[i].Gender}
-		lastId++
-	}
-
-	ci.csv.Addrow(characters)
 
 	return
 }
 
 //Index return all characters
 func (ci CharactersInteractor) Index() (characters domain.Characters, err error) {
-	data, err := ci.csv.ReadCsvFile()
-
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
-
-	characters, err = ci.repo.FindAll(data)
+	characters, err = ci.repo.FindAll()
 
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -76,17 +54,24 @@ func (ci CharactersInteractor) Index() (characters domain.Characters, err error)
 }
 
 //Show return character by ID
-func (ci CharactersInteractor) Show(characterID int) (character *domain.Character, err error) {
-	data, err := ci.csv.ReadCsvFile()
+func (ci CharactersInteractor) Show(characterID int) (character domain.Character, err error) {
+	characters, err := ci.repo.FindAll()
 
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return domain.Character{}, errors.New(err.Error())
 	}
 
-	character, err = ci.repo.FindByID(data, characterID)
+	character = domain.Character{}
 
-	if err != nil {
-		return nil, errors.New(err.Error())
+	for _, v := range characters {
+		if v.ID == characterID {
+			character = v
+			break
+		}
+	}
+
+	if (domain.Character{}) == character {
+		return domain.Character{}, errors.New("error: character doesn't exist")
 	}
 
 	return

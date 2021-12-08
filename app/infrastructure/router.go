@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"go-project/app/common"
 	"go-project/app/interfaces"
 	"go-project/app/repository"
 	"go-project/app/usecases"
@@ -18,7 +19,8 @@ const URL string = "https://swapi.dev/api/people"
 // Dispatch is handle routing
 func Dispatch() {
 	//dependendy injection
-	charactersService := usecases.NewCharactersInteractor(repository.NewCharacterRepo(), repository.NewApiRepo(URL), repository.NewCsvRepo(CSVFile))
+	characterRepository := repository.NewCharacterRepo(common.NewCsvRepo(), CSVFile, URL)
+	charactersService := usecases.NewCharactersInteractor(characterRepository)
 	charactersHandler := interfaces.NewCharactersHandler(charactersService)
 
 	r := chi.NewRouter()
@@ -29,6 +31,7 @@ func Dispatch() {
 		r.Get("/", charactersHandler.Index)
 		r.Get("/{id}", charactersHandler.Show)
 		r.Get("/fetch-characters", charactersHandler.FetchCharacters)
+		r.Get("/concurrent-characters", charactersHandler.ConcurrentCharacters)
 	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {

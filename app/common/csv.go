@@ -1,4 +1,4 @@
-package repository
+package common
 
 import (
 	"encoding/csv"
@@ -12,17 +12,16 @@ import (
 //const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resources/characters.csv"
 
 type CsvRepo struct {
-	filePath string
 }
 
 //NewCharacterRepo factory Character repo
-func NewCsvRepo(filePath string) CsvRepo {
-	return CsvRepo{filePath: filePath}
+func NewCsvRepo() CsvRepo {
+	return CsvRepo{}
 }
 
-//ReadCsvFile reads csv File
-func (cs CsvRepo) ReadCsvFile() ([][]string, error) {
-	f, err := os.Open(cs.filePath)
+//ReadCsvFiletoString reads csv File return [][]strings
+func (cs CsvRepo) ReadCsvFiletoString(filePath string) ([][]string, error) {
+	f, err := os.Open(filePath)
 
 	if err != nil {
 		return nil, errors.New("error while trying to open CSV file")
@@ -36,19 +35,18 @@ func (cs CsvRepo) ReadCsvFile() ([][]string, error) {
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-
 	return records, nil
 }
 
 // Updates Csvfile
-func (cs CsvRepo) Addrow(characters domain.Characters) error {
-	f, err := os.OpenFile(cs.filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+func (cs CsvRepo) Addrows(characters domain.Characters, filePath string) error {
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return errors.New(err.Error())
 	}
 	w := csv.NewWriter(f)
 	for _, character := range characters {
-		row := []string{strconv.Itoa(character.ID), character.Name, strconv.Itoa(character.Height), strconv.Itoa(character.Mass), character.HairColor, character.SkinColor, character.EyeColor, character.BirthYear, character.Gender}
+		row := []string{strconv.Itoa(character.ID), character.Name}
 		w.Write(row)
 	}
 	w.Flush()
