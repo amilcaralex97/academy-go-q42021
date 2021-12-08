@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,13 +83,6 @@ func TestCharacterInteractor_Index(t *testing.T) {
 			false,
 		},
 		{
-			"First character is Amilcar",
-			characters,
-			nil,
-			characters,
-			false,
-		},
-		{
 			"error ocurred",
 			nil,
 			errors.New(""),
@@ -109,7 +101,6 @@ func TestCharacterInteractor_Index(t *testing.T) {
 
 			if !tc.expectsErr {
 				assert.Equal(t, tc.expected, actual)
-				assert.Equal(t, actual[0], tc.expected[0])
 			}
 
 			if tc.expectsErr {
@@ -157,8 +148,6 @@ func TestCharacterInteractor_Show(t *testing.T) {
 			service := NewCharactersInteractor(mockCharacters)
 			actual, err := service.Show(tc.id)
 
-			fmt.Println(actual)
-
 			if !tc.expectsErr {
 				assert.Equal(t, tc.expected, actual)
 			}
@@ -189,13 +178,6 @@ func TestCharacterInteractor_FetchCharacters(t *testing.T) {
 			false,
 		},
 		{
-			"First character is Amilcar",
-			characters,
-			nil,
-			characters,
-			false,
-		},
-		{
 			"error ocurred",
 			nil,
 			errors.New(""),
@@ -214,7 +196,6 @@ func TestCharacterInteractor_FetchCharacters(t *testing.T) {
 
 			if !tc.expectsErr {
 				assert.Equal(t, tc.expected, actual)
-				assert.Equal(t, actual[0], tc.expected[0])
 			}
 
 			if tc.expectsErr {

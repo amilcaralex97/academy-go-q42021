@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"reflect"
+	"go-project/app/domain"
 	"testing"
 
-	"go-project/app/domain"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 var characters = domain.Characters{
@@ -27,37 +28,56 @@ var cases = [][]string{
 	},
 }
 
-func TestModel_FindAll(t *testing.T) {
-	charactersTest, _ := NewCharacterRepo().FindAll(cases)
-	expectedLen := 2
-
-	if len(charactersTest) != expectedLen {
-		t.Error("characters wrong size")
-	}
+type mockCsv struct {
+	mock.Mock
 }
 
-func TestModel_WorkerPoolCsv(t *testing.T) {
-	charactersTest, _ := NewCharacterRepo().WorkerPoolCsv("odd", 6, 5)
-	expectedLen := 6
-
-	if reflect.TypeOf(charactersTest[0]) != reflect.TypeOf(characters[0]) {
-		t.Error("response is not type Character")
-	}
-
-	if len(charactersTest) != expectedLen {
-		t.Error("response wrong size")
-	}
+var cr = CharactersRepo{
+	csvC: mockCsv{},
 }
 
-func TestModel_FetchCharacters(t *testing.T) {
-	charactersTest, _ := NewCharacterRepo().FetchCharacters()
-	expectedLen := 10
+func (mc mockCsv) ReadCsvFiletoString(filePath string) ([][]string, error) {
+	return cases, nil
+}
 
-	if reflect.TypeOf(charactersTest[0]) != reflect.TypeOf(characters[0]) {
-		t.Error("response is not type Character")
+func (mc mockCsv) Addrows(characters domain.Characters, filePath string) error {
+	return nil
+}
+
+func TestCharacterInteractor_FindAll(t *testing.T) {
+	testCases := []struct {
+		name       string
+		response   domain.Characters
+		repoErr    error
+		expected   domain.Characters
+		expectsErr bool
+	}{
+		{
+			"Get charcaters",
+			characters,
+			nil,
+			characters,
+			false,
+		},
 	}
 
-	if len(charactersTest) != expectedLen {
-		t.Error("response wrong size")
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockC := mockCsv{}
+			mockC.On("ReadCsvFiletoString").Return(tc.response, tc.repoErr)
+
+			repo := NewCharacterRepo(mockC, "", "")
+			actual, err := repo.FindAll()
+
+			if !tc.expectsErr {
+				assert.Equal(t, tc.expected, actual)
+			}
+
+			if tc.expectsErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
 	}
 }
