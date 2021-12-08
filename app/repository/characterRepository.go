@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"math"
@@ -41,7 +40,6 @@ func NewCharacterRepo(csvC csvI, file string, api string) CharactersRepo {
 //FindAll gets characters from csv
 func (cr CharactersRepo) FindAll() (domain.Characters, error) {
 	data, err := cr.csvC.ReadCsvFiletoString(cr.file)
-
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
@@ -67,19 +65,12 @@ func (cr CharactersRepo) FetchCharacters() (domain.Characters, error) {
 	responseObject := Response{}
 	json.Unmarshal(responseData, &responseObject)
 
-	fmt.Println(responseObject.Results)
-
 	data, err := cr.csvC.ReadCsvFiletoString(cr.file)
-
-	fmt.Println(data)
-
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
 	lastId := len(data)
-
-	fmt.Println(lastId)
 
 	for i := 0; i < len(responseObject.Results); i++ {
 		responseObject.Results[i].ID = lastId + 1

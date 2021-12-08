@@ -22,6 +22,7 @@ func NewCsvRepo() CsvRepo {
 //ReadCsvFiletoString reads csv File return [][]strings
 func (cs CsvRepo) ReadCsvFiletoString(filePath string) ([][]string, error) {
 	f, err := os.Open(filePath)
+
 	if err != nil {
 		return nil, errors.New("error while trying to open CSV file")
 	}
@@ -30,6 +31,7 @@ func (cs CsvRepo) ReadCsvFiletoString(filePath string) ([][]string, error) {
 
 	csvReader := csv.NewReader(f)
 	records, err := csvReader.ReadAll()
+
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
