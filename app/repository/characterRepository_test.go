@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"reflect"
 	"testing"
 
 	"go-project/app/domain"
@@ -35,11 +36,28 @@ func TestModel_FindAll(t *testing.T) {
 	}
 }
 
-func TestModel_FindByID(t *testing.T) {
-	expected := characters[0]
-	character, _ := NewCharacterRepo().FindByID(cases, 1)
-	if character != expected {
-		t.Fail()
-		t.Log("Actual:", character, "Expected:", expected)
+func TestModel_WorkerPoolCsv(t *testing.T) {
+	charactersTest, _ := NewCharacterRepo().WorkerPoolCsv("odd", 6, 5)
+	expectedLen := 6
+
+	if reflect.TypeOf(charactersTest[0]) != reflect.TypeOf(characters[0]) {
+		t.Error("response is not type Character")
+	}
+
+	if len(charactersTest) != expectedLen {
+		t.Error("response wrong size")
+	}
+}
+
+func TestModel_FetchCharacters(t *testing.T) {
+	charactersTest, _ := NewCharacterRepo().FetchCharacters()
+	expectedLen := 10
+
+	if reflect.TypeOf(charactersTest[0]) != reflect.TypeOf(characters[0]) {
+		t.Error("response is not type Character")
+	}
+
+	if len(charactersTest) != expectedLen {
+		t.Error("response wrong size")
 	}
 }

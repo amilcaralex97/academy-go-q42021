@@ -1,4 +1,4 @@
-package repository
+package common
 
 import (
 	"encoding/csv"
@@ -12,17 +12,16 @@ import (
 //const CSVFile string = "/Users/alejandrosanchez/Documents/go_bootcamp/app/resources/characters.csv"
 
 type CsvRepo struct {
-	filePath string
 }
 
 //NewCharacterRepo factory Character repo
-func NewCsvRepo(filePath string) CsvRepo {
-	return CsvRepo{filePath: filePath}
+func NewCsvRepo() CsvRepo {
+	return CsvRepo{}
 }
 
-//ReadCsvFile reads csv File return [][]strings
-func (cs CsvRepo) ReadCsvFiletoString() ([][]string, error) {
-	f, err := os.Open(cs.filePath)
+//ReadCsvFiletoString reads csv File return [][]strings
+func (cs CsvRepo) ReadCsvFiletoString(filePath string) ([][]string, error) {
+	f, err := os.Open(filePath)
 	if err != nil {
 		return nil, errors.New("error while trying to open CSV file")
 	}
@@ -37,21 +36,9 @@ func (cs CsvRepo) ReadCsvFiletoString() ([][]string, error) {
 	return records, nil
 }
 
-func (cs CsvRepo) ReadCsvFile() (*csv.Reader, error) {
-	f, err := os.Open(cs.filePath)
-
-	if err != nil {
-		return nil, errors.New("error while trying to open CSV file")
-	}
-
-	csvReader := csv.NewReader(f)
-
-	return csvReader, nil
-}
-
 // Updates Csvfile
-func (cs CsvRepo) Addrows(characters domain.Characters) error {
-	f, err := os.OpenFile(cs.filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+func (cs CsvRepo) Addrows(characters domain.Characters, filePath string) error {
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return errors.New(err.Error())
 	}
